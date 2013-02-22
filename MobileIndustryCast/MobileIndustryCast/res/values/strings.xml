@@ -12,5 +12,14 @@
     <string name="new_post">NEW POST</string>
     <string name="post_text_hint">Type your message...</string>
     <string name="post_button">Post</string>
+    <string name="host_port">Host/Port:</string>
+    <string name="service_tab">Service</string>
+    <string name="user_id_tab">User ID:</string>
+    <string name="password_tab">Password</string>
+    <string name="host_str">Host</string>
+    <string name="host_hint">Host</string>
+    <string name="port_hint">Port</string>
+    <string name="service_name_hint">Service Name</string>
+    <string name="user_id_hint">User ID</string>
 
 </resources>
