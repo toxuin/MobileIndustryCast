@@ -68,8 +68,7 @@ public class ChatRoom extends Activity  {
     			}).start();
     	    	//EditText chatLog = (EditText) findViewById(R.id.chatBox);
     	    	
-    	    	//chatLog.setText(chatLog.getText().append("\n").append(message));
-    	    	System.out.println("Error I passed the action");
+    	   
 
         		
         	  	
