@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.view.View;
 import android.os.Handler;
+import android.os.Looper;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -13,6 +14,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.PacketListener;
@@ -24,9 +26,9 @@ import org.jivesoftware.smack.util.StringUtils;
 /**
  * Gather the xmpp settings and create an XMPPConnection
  */
-public class XMPP_setting extends Activity implements MessageListener  {
+public class XMPP_setting extends Activity {
     //for final server use
-	private static final String HOST = "192.168.1.116";//"http://velington-pc"
+	private static final String HOST = "Velington-PC";//"http://velington-pc"
 	private static final int PORT_NUMBER = 5222 ;
 	private static final String SERVICE = "conference.velington-pc";
 	private static final String RECIPIENT = "industrycast";
@@ -46,11 +48,31 @@ public class XMPP_setting extends Activity implements MessageListener  {
     	System.out.println("XMPP_Connect class' function 'login' configuration compleate");
     	
         connection = new XMPPConnection(config);
-
-        connection.connect();
+        
+        try
+        {
+        	connection.connect();
+        } 
+        catch(XMPPException ex)
+        {
+        	this.setConnection(null);
+        	System.out.println("Exception at connect");
+        	System.out.println(ex.toString());
+        }
         System.out.println("connection to the server established");
  
+        try
+        {
         connection.login(userName, password);
+        Presence presence = new Presence(Presence.Type.available);
+        connection.sendPacket(presence);
+        this.setConnection(connection);
+        } 
+        catch(XMPPException ex)
+        {
+        	this.setConnection(null);
+        	System.out.println("Exception at login");
+        }
         System.out.println("XMPP_Connect class' function 'login' ended");
     }
  
@@ -62,20 +84,6 @@ public class XMPP_setting extends Activity implements MessageListener  {
         System.out.println("XMPP_Connect class' function 'sendMessage' ended");
     }
     
-    public void processMessage(Chat chat, Message message) {
-        if (message.getType() == Message.Type.groupchat) {
-            System.out.println(chat.getParticipant() + " says: " + message.getBody());
-            
-
-            
-            //change for activity message
-            try {
-                chat.sendMessage(message.getBody() + " echo");
-            } catch (XMPPException ex) {
-                
-            }
-        }
-    }
     
     public void setConnection
     (XMPPConnection connection) {

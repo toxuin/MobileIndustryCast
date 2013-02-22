@@ -8,6 +8,7 @@ import com.mobileindustrycast.XMPP_setting;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -38,13 +39,14 @@ public class ChatRoom extends Activity  {
     			new Thread(new Runnable(){
     				public void run()
     				{
+    					Looper.prepare();
     					String message = ((EditText)findViewById(R.id.post_text)).getText().toString();
     					XMPP_setting xmpp = new XMPP_setting();
-    					System.out.println("Connection successfully established");
     					try
     					{
     						System.out.println(message);
     						xmpp.login("andrey", "12345");
+    						 
     					}
     					catch (XMPPException ex)
     					{
@@ -61,6 +63,7 @@ public class ChatRoom extends Activity  {
     					}
 
     					xmpp.disconnect();
+    					Looper.loop();
     				}
     			}).start();
     	    	//EditText chatLog = (EditText) findViewById(R.id.chatBox);
