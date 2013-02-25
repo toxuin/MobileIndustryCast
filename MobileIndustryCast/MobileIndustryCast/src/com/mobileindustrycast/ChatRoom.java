@@ -17,15 +17,17 @@ import android.view.View.OnClickListener;
 
 public class ChatRoom extends Activity  {
 
-
+	
+	XMPP_setting xmpp = new XMPP_setting();
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat_room);
-       
-        
+        setContentView(R.layout.activity_chat_room);       
         Button button = (Button) findViewById(R.id.post_btn);
 
+        
+        
         button.setOnClickListener(new OnClickListener()
         {
         	public void onClick(View v) {
@@ -40,8 +42,11 @@ public class ChatRoom extends Activity  {
     				public void run()
     				{
     					Looper.prepare();
+    			    	
+    					
+    					
     					String message = ((EditText)findViewById(R.id.post_text)).getText().toString();
-    					XMPP_setting xmpp = new XMPP_setting();
+    					
     					try
     					{
     						System.out.println(message);
@@ -55,7 +60,7 @@ public class ChatRoom extends Activity  {
     			 
     					try 
     					{
-    						xmpp.sendMessage(message); // (message, userTosent)
+    						xmpp.sendMessage("industrycast",message); // (message, userTosent)
     					} 
     					catch (XMPPException e) 
     					{
@@ -66,7 +71,7 @@ public class ChatRoom extends Activity  {
     					Looper.loop();
     				}
     			}).start();
-    	    	//EditText chatLog = (EditText) findViewById(R.id.chatBox);
+
     	    	
     	   
 
@@ -89,73 +94,3 @@ public class ChatRoom extends Activity  {
    
 }
 
-
-//package com.mobileindustrycast;
-//
-//import java.util.ArrayList;
-//import android.app.Activity;
-//import android.os.Bundle;
-//import android.os.Handler;
-//import android.view.View;
-//import android.widget.ArrayAdapter;
-//import android.widget.Button;
-//import android.widget.EditText;
-//import android.widget.ListView;
-//
-//import org.jivesoftware.smack.XMPPConnection;
-//
-//import org.jivesoftware.smack.packet.Message;
-//
-//
-//public class ChatRoom extends Activity {
-//
-//
-//    private Handler handler = new Handler();
-//    private EditText recipient;
-//    private EditText text;
-//    private ListView list;
-//    private XMPP_setting settings;
-//    private XMPPConnection connection;
-//    
-//    /** Called when the activity is first created. */
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_chat_room);
-//        
-//        text = (EditText) this.findViewById(R.id.post_text);
-//        list = (ListView) this.findViewById(R.id.message_List);
-//        setListAdapter();
-//        
-//      //Window for getting settings
-//       settings = new XMPP_setting();
-//        
-//        
-//        
-//        //Listener for chat message
-//        Button send = (Button) this.findViewById(R.id.post_btn);
-//        send.setOnClickListener(new View.OnClickListener() {
-//            
-//            @Override
-//            public void onClick(View v) {
-//                String to = "industrycast";
-//                String text1 = text.getText().toString();
-//                
-//                Message msg = new Message(to, Message.Type.groupchat);
-//                msg.setBody(text1);
-//                connection.sendPacket(msg);
-//                messages.add(connection.getUser() + ":");
-//                messages.add(text1);
-//                setListAdapter();                
-//            }
-//        });        
-//    }
-//    
-//
-//   
-//    
-//
-//    
-//
-//
-//}
