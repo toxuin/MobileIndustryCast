@@ -21,5 +21,9 @@
     <string name="port_hint">Port</string>
     <string name="service_name_hint">Service Name</string>
     <string name="user_id_hint">User ID</string>
+    <string name="buyer_toggle">Buyer</string>
+    <string name="seller_toggle">Seller</string>
+    <string name="trade_toggle">Trade</string>
+    <string name="info_toggle">Info</string>
 
 </resources>

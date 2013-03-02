@@ -5,6 +5,7 @@ import org.jivesoftware.smack.XMPPException;
 
 import com.mobileindustrycast.R;
 import com.mobileindustrycast.XMPP_setting;
+import com.mobileindustrycast.ChatListActivity;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -25,19 +26,15 @@ public class ChatRoom extends Activity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);       
         Button button = (Button) findViewById(R.id.post_btn);
-
-        
+        ChatListActivity chatActivity=new ChatListActivity();
+       
         
         button.setOnClickListener(new OnClickListener()
         {
         	public void onClick(View v) {
-        		
-
-    			
     			//Here we should have a request sending to XMPP server
     			System.out.println("Button pressed event occured");
-    			
-    						
+
     			new Thread(new Runnable(){
     				public void run()
     				{
@@ -50,7 +47,7 @@ public class ChatRoom extends Activity  {
     					try
     					{
     						System.out.println(message);
-    						xmpp.login("andrey", "12345");
+    						xmpp.login();
     						 
     					}
     					catch (XMPPException ex)
@@ -60,7 +57,7 @@ public class ChatRoom extends Activity  {
     			 
     					try 
     					{
-    						xmpp.sendMessage("industrycast",message); // (message, userTosent)
+    						xmpp.sendMessage(message); // (message, userTosent)
     					} 
     					catch (XMPPException e) 
     					{

@@ -44,7 +44,8 @@ public class XMPP_setting extends Activity {
 	private static final int PORT_NUMBER = 5222 ;
 	private static final String SERVICE = "conference.velington-pc";
 	private static final String RECIPIENT = "industrycast";
-	
+	private static final String LOGIN="andrey";
+	private static final String PASSWORD="12345";
 
 	private ArrayList<String> messages = new ArrayList<String>();
 	XMPPConnection connection;
@@ -54,7 +55,7 @@ public class XMPP_setting extends Activity {
 	//mlist.setAdapter(adapter);
 	
     
-    public void login(String userName, String password) throws XMPPException {
+    public void login() throws XMPPException {
     	
 
     	
@@ -81,7 +82,7 @@ public class XMPP_setting extends Activity {
         
         try
         {
-        connection.login(userName, password);
+        connection.login(LOGIN, PASSWORD);
         Presence presence = new Presence(Presence.Type.available);
         connection.sendPacket(presence);
         
@@ -94,13 +95,13 @@ public class XMPP_setting extends Activity {
         System.out.println("XMPP_Connect class' function 'login' ended");
     }
  
-    public void sendMessage(String  to, String message_body) throws XMPPException {
+    public void sendMessage(String message_body) throws XMPPException {
     	System.out.println("XMPP_Connect class' function 'sendMessage' started");
     	        
         if(!message_body.equals(""))
         {
             ChatManager chatmanager = connection.getChatManager();
-            Chat newChat = chatmanager.createChat(to, null);
+            Chat newChat = chatmanager.createChat(RECIPIENT, null);
             
             try
             {
@@ -143,10 +144,10 @@ public class XMPP_setting extends Activity {
 
     private void processMessage(Message message)
     {
-        String messageBody = message.getBody();
-        String JID = message.getFrom();
+        //String messageBody = message.getBody();
+        //String JID = message.getFrom();
         try{
-        sendMessage(JID, messageBody);}
+        sendMessage(message.getBody());}
         catch(XMPPException e)
         {
         	System.out.println(e.getMessage());
