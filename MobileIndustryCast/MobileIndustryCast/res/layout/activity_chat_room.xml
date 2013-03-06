@@ -25,6 +25,13 @@
             android:gravity="left|center"
             android:orientation="vertical" >
 
+            <EditText
+                android:id="@+id/search_text"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/search_hint" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -36,16 +43,6 @@
                     android:layout_height="wrap_content"
                     android:text="@string/search_posts"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                <EditText
-                    android:id="@+id/search_text"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="@string/search_hint" >
-
-                    <requestFocus />
-                </EditText>
 
             </LinearLayout>
 
@@ -145,10 +142,11 @@
         </LinearLayout>
 
         <ListView
-            android:id="@+id/ChatListActivity"
-            android:layout_width="369dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.77" >
+            android:id="@+id/message_list"
+            android:layout_width="242dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.22" >
+
         </ListView>
 
     </LinearLayout>

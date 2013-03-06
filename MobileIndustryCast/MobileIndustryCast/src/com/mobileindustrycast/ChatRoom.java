@@ -20,65 +20,52 @@ public class ChatRoom extends Activity  {
 
 	
 	XMPP_setting xmpp = new XMPP_setting();
+
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);       
         Button button = (Button) findViewById(R.id.post_btn);
-        ChatListActivity chatActivity=new ChatListActivity();
-       
-        
-        button.setOnClickListener(new OnClickListener()
-        {
-        	public void onClick(View v) {
-    			//Here we should have a request sending to XMPP server
-    			System.out.println("Button pressed event occured");
+		ChatListActivity chatActivity = new ChatListActivity();
 
-    			new Thread(new Runnable(){
-    				public void run()
-    				{
-    					Looper.prepare();
-    			    	
-    					
-    					
-    					String message = ((EditText)findViewById(R.id.post_text)).getText().toString();
-    					
-    					try
-    					{
-    						System.out.println(message);
-    						xmpp.login();
-    						 
-    					}
-    					catch (XMPPException ex)
-    					{
-    						System.out.println("Unable to log in with credinals provided");
-    					}//To be developed. Proposing Pop-up window "Cannot connect to the server"
-    			 
-    					try 
-    					{
-    						xmpp.sendMessage(message); // (message, userTosent)
-    					} 
-    					catch (XMPPException e) 
-    					{
-    						System.out.println("Sending message failed");
-    					}
+		new Thread(new Runnable() {
+			public void run() {
+				//Looper.prepare();
+				try {
+					xmpp.login();
 
-    					xmpp.disconnect();
-    					Looper.loop();
-    				}
-    			}).start();
+				} catch (XMPPException ex) {
+					System.out
+							.println("Unable to log in with credinals provided");
+					System.out.println(ex.toString());
+				}
+				// xmpp.disconnect();
+				//Looper.loop();
+			}
+		}).start();
 
-    	    	
-    	   
+		button.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				// Here we should have a request sending to XMPP server
+				System.out.println("Button pressed event occured");
 
-        		
-        	  	
-    	} 
-        });
-        
-        
-    }
+				String message = ((EditText) findViewById(R.id.post_text))
+						.getText().toString();
+				System.out.println("Text from the text field: " + message);
+
+				try {
+					xmpp.sendMessage(message); // (message, userTosent)
+
+				} catch (XMPPException e) {
+					System.out.println("Sending message failed");
+					System.out.println(e.toString());
+				}
+
+			}
+		});
+
+	}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
