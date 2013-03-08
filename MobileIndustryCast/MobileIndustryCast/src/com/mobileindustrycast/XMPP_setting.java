@@ -52,34 +52,39 @@ public class XMPP_setting extends Activity {
 	private static final String RECIPIENT = "industrycast";
 	private static final String LOGIN="andrey";
 	private static final String PASSWORD="12345";
+	
+	MultiUserChat muc; 
 
+	private Handler mHandler = new Handler();
 	private ArrayList<String> messages = new ArrayList<String>();
 	XMPPConnection connection;
 
 	  
 	
 	
-	/*public void createListAdapter() {
+	public void createListAdapter() {
 	
-		public final ListView mlist = (ListView) findViewById(R.id.message_list);
-		ArrayAdapter<String> adapter = new ArrayAdapter<String> (this, android.R.layout.simple_list_item_2, messages);
+		final ListView mlist = (ListView) findViewById(R.id.messagesListView);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String> (this, android.R.layout.simple_list_item_1, messages);
 		mlist.setAdapter(adapter);
-	}*/
+	}
 	
 	
-    
+    //Set of functions necessary to perform login(from user point perspective)
 	public void login() throws XMPPException {
 
-		// createListAdapter();
+		
 		System.out.println("XMPP_Connect class' function 'login' started");
-		ConnectionConfiguration config = new ConnectionConfiguration(HOST,
-				PORT_NUMBER, SERVICE);
-		// config.setDebuggerEnabled(true);
-		System.out
-				.println("XMPP_Connect class' function 'login' configuration compleate");
+		
+		//Configuring connection parameters with the setting predefined by team or user's input if available
+		ConnectionConfiguration config = new ConnectionConfiguration(HOST,PORT_NUMBER, SERVICE);
+		
+		// config.setDebuggerEnabled(true); <--helpful if you are encountering a problem on the XMPP side(LogCat output)
+		System.out.println("XMPP_Connect class' function 'login' configuration compleate");
 
 		connection = new XMPPConnection(config);
 
+		//Connecting to selected host and service
 		try {
 			SASLAuthentication.supportSASLMechanism("PLAIN", 0);
 			connection.connect();
@@ -90,13 +95,18 @@ public class XMPP_setting extends Activity {
 		System.out.println("connection to the server established");
 
 		try {
+			//user login. Needs to match the data from the DB associated with OpenFire Server
 			connection.login(LOGIN, PASSWORD);
+			
+			//Setting up message listener
+			muc  = new MultiUserChat(connection, "industrycast@conference.velington-pc");
+		    muc.join("Testbot");//To include preferred user name(constrains may apply)
+	        ConsumerMUCMessageListener listener = new ConsumerMUCMessageListener();
+	        muc.addMessageListener(listener);
+			
+	        //sending presence packet, showing your availability to the server
 			Presence presence = new Presence(Presence.Type.available);
-			connection.sendPacket(presence);
-			//setUpListener(connection);
-			
-			
-
+			connection.sendPacket(presence);						
 		} catch (XMPPException ex) {
 			System.out.println(ex.toString());
 		}
@@ -104,37 +114,10 @@ public class XMPP_setting extends Activity {
 
 	}
     
-    public void setUpListener(XMPPConnection con){
-    	
-    	PacketFilter filter =new MessageTypeFilter(Message.Type.chat);// new AndFilter(new PacketTypeFilter(Message.class));
-
-    //	PacketCollector myCollector = con.createPacketCollector(filter);
-    	// Normally, you'd do something with the collector, like wait for new packets.
-    	System.out.println("Listener is set up");
-    	// Next, create a packet listener. We use an anonymous inner class for brevity.
-    	PacketListener myListener = new PacketListener() {
-    			@Override
-    	        public void processPacket(Packet packet) {
-    	            Message msg = (Message) packet;
-    	            System.out.println(msg.getFrom()+ ": " + msg.getBody());
-    	        }
-    	    };
-    	
-    	con.addPacketListener(myListener, filter);
-    	
-    	
-    }
- 
+	//sending message to the Multi-User Chat
     public void sendMessage(String message_body) throws XMPPException {
     	System.out.println("XMPP_Connect class' function 'sendMessage' started");
-    	        
-        if(!message_body.equals(""))
-        {
-        	 MultiUserChat muc = new MultiUserChat(connection, "industrycast@conference.velington-pc");
-        	 muc.join("testbot");
-        	 ConsumerMUCMessageListener listener = new ConsumerMUCMessageListener();
-             muc.addMessageListener(listener);
-        	
+        	 	
             try
             {
                 muc.sendMessage(message_body);
@@ -145,63 +128,27 @@ public class XMPP_setting extends Activity {
             }
 
             messages.add(": " + message_body);
-        }
     }
     
  
-    	
-
-      /* private String doInBackground(String... params) {
-            // TODO Auto-generated method stub
-
-            String to = params[0];
-
-            // Accept only messages from friend@gmail.com
-            PacketFilter filter 
-                = new AndFilter(new PacketTypeFilter(Message.class), 
-                                new FromContainsFilter(to));
-
-            // Collect these messages
-            PacketCollector collector = connection.createPacketCollector(filter);
-
-            while(true) {
-              Packet packet = collector.nextResult();
-
-              if (packet instanceof Message) {
-                Message msg = (Message) packet;
-                // Process message
-               System.out.println(msg.getFrom()+ ": " + msg.getBody());
-              }
-            }
-
-            //return null;
-        }*/
-
-
-    private void processMessage(Message message)
-    {
-        //String messageBody = message.getBody();
-        //String JID = message.getFrom();
-        try{
-        sendMessage(message.getBody());}
-        catch(XMPPException e)
-        {
-        	System.out.println(e.getMessage());
-        }
-
-    }
-    
+    //Function used to disconnect from the server connection(may be necessary if the server doesn't kick idle users) to be used in onDestruct()
     public void disconnect() {
         connection.disconnect();
     }
-
-
+    //Multi-User Chat listener class, necessary for packet(message type in this case) retrieval from the server. Adds messages received to the "messages" array
     class ConsumerMUCMessageListener implements PacketListener {
  
         public void processPacket(Packet packet) {
             if ( packet instanceof Message) {
             	Message msg = (Message) packet;
+            	messages.add(msg.getFrom() +": " + msg.getBody());
                 System.out.println(msg.getFrom() +": " + msg.getBody());
+                // Add the incoming message to the list view(crashes the application currently)
+                /*mHandler.post(new Runnable() {
+                    public void run() {
+                      createListAdapter();
+                    }
+                  });*/
             }
         }
 

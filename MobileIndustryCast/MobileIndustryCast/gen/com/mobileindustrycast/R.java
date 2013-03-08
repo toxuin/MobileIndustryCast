@@ -24,7 +24,7 @@ public final class R {
         public static final int login_form=0x7f07000d;
         public static final int menu_forgot_password=0x7f070016;
         public static final int menu_settings=0x7f070015;
-        public static final int message_list=0x7f07000c;
+        public static final int messagesListView=0x7f07000c;
         public static final int password=0x7f070012;
         public static final int port=0x7f07000f;
         public static final int post_btn=0x7f07000b;

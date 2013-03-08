@@ -29,36 +29,35 @@ public class ChatRoom extends Activity  {
         Button button = (Button) findViewById(R.id.post_btn);
 		ChatListActivity chatActivity = new ChatListActivity();
 
+		
+		//Working Thread that's associated with networking function login()
 		new Thread(new Runnable() {
 			public void run() {
-				//Looper.prepare();
-				try {
+				
+				try 
+				{
 					xmpp.login();
 
 				} catch (XMPPException ex) {
-					System.out
-							.println("Unable to log in with credinals provided");
 					System.out.println(ex.toString());
 				}
 				// xmpp.disconnect();
-				//Looper.loop();
+
 			}
 		}).start();
 
+		//Post button event. Sends message with user defined body to the Openfire Server
 		button.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				// Here we should have a request sending to XMPP server
 				System.out.println("Button pressed event occured");
 
-				String message = ((EditText) findViewById(R.id.post_text))
-						.getText().toString();
+				String message = ((EditText) findViewById(R.id.post_text)).getText().toString();//getting message body from user input
 				System.out.println("Text from the text field: " + message);
 
-				try {
-					xmpp.sendMessage(message); // (message, userTosent)
-
+				try 
+				{
+					xmpp.sendMessage(message); 
 				} catch (XMPPException e) {
-					System.out.println("Sending message failed");
 					System.out.println(e.toString());
 				}
 
