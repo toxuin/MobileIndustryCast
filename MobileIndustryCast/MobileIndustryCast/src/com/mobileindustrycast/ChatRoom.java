@@ -81,13 +81,19 @@ public class ChatRoom extends Activity  {
 
 				String message = ((EditText) findViewById(R.id.post_text)).getText().toString();//getting message body from user input
 				System.out.println("Text from the text field: " + message);
-
-				try 
+				
+				//if text fiend is not empty sends the message to the server in for of extended message(timestamp and uresname are included in the message body)
+				if (message!="")
 				{
-					sendMessage(xmpp.extendedMessage(message)); 
-					((EditText) findViewById(R.id.post_text)).setText("");
-				} catch (XMPPException e) {
-					System.out.println(e.toString());
+					try 
+					{
+						sendMessage(xmpp.extendedMessage(message)); 
+						((EditText) findViewById(R.id.post_text)).setText("");
+					} 
+					catch (XMPPException e) 
+					{
+						System.out.println(e.toString());
+					}
 				}
 
 			}
