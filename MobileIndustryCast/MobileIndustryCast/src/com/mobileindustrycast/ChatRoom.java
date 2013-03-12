@@ -40,10 +40,8 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
 	String USERNAME="Testbot";
 	String userLocation = "BC";
 	String userStatus = "Buyer";
-	boolean isBuyer = false;
-	boolean isSeller = false;
-	boolean isTrade = false;
-	boolean isInfo = false;
+
+	String filter ="";
     
 	ExtendedArrayAdapter adapter;
 	
@@ -60,19 +58,20 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
         Button post_button = (Button) findViewById(R.id.post_btn);
         Button broadcast_button = (Button) findViewById(R.id.broadcast_btn);
         
-        ToggleButton buyer = (ToggleButton) findViewById(R.id.toggle_buyer);
-        ToggleButton seller = (ToggleButton) findViewById(R.id.toggle_seller);
-        ToggleButton trade = (ToggleButton) findViewById(R.id.toggle_trade);
-        ToggleButton info = (ToggleButton) findViewById(R.id.toggle_info);
+        final ToggleButton buyer = (ToggleButton) findViewById(R.id.toggle_buyer);
+        final ToggleButton seller = (ToggleButton) findViewById(R.id.toggle_seller);
+        final ToggleButton trade = (ToggleButton) findViewById(R.id.toggle_trade);
+        final ToggleButton info = (ToggleButton) findViewById(R.id.toggle_info);
+
         
         buyer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    isBuyer = true;
-                    adapter.getFilter().filter("Buyer");
+                    adapter.buyerSelected=true;
+                    adapter.getFilter().filter(filter);
                 } else {
-                	isBuyer = false;
-                	adapter.getFilter().filter("");
+                	adapter.buyerSelected=false;
+                	adapter.getFilter().filter(filter);
                 }
             }
         });
@@ -80,10 +79,11 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
         seller.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    isSeller = true;
-                    adapter.getFilter().filter("Seller");
+                	adapter.sellerSelected=true;
+                	adapter.getFilter().filter(filter);
                 } else {
-                	isSeller = false;
+                	adapter.sellerSelected=false;
+                	adapter.getFilter().filter(filter);
                 }
             }
         });
@@ -91,9 +91,11 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
         trade.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    isTrade = true;
+                	adapter.tradeSelected=true;
+                	adapter.getFilter().filter(filter);
                 } else {
-                	isTrade = false;
+                	adapter.tradeSelected=false;
+                	adapter.getFilter().filter(filter);
                 }
             }
         });
@@ -101,9 +103,11 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
         info.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    isInfo = true;
+                	adapter.infoSelected=true;
+                	adapter.getFilter().filter(filter);
                 } else {
-                	isInfo = false;
+                	adapter.infoSelected=false;
+                	adapter.getFilter().filter(filter);
                 }
             }
         });
@@ -188,7 +192,8 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
         
         @Override
 		public void onTextChanged(CharSequence s, int start,int before, int count) {
-        	adapter.getFilter().filter(s.toString());
+        	filter = s.toString();
+        	adapter.getFilter().filter(filter);
 		}
 		});}
             
@@ -306,11 +311,12 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
             	message = (Message) packet;
             	
    				msg.add(messageDeConstructor(message.getBody()));
-                System.out.println(message.getFrom() +": " + message.getBody());
+                System.out.println(message.getFrom() +": " + messageDeConstructor(message.getBody()).messageToString());
                 // Add the incoming message to the list view(crashes the application currently)
                 mHandler.post(new Runnable() {
                     public void run() {
                    	createListAdapter();
+                   	adapter.getFilter().filter(filter);
                     }
                   });
             }

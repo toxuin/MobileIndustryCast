@@ -1,7 +1,6 @@
 package com.mobileindustrycast;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -14,15 +13,23 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+@SuppressLint("DefaultLocale")
 public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
   private Context context;
   private ArrayList<CustomListMessage> messageList;
-
+  private ArrayList<CustomListMessage> mOriginalValues;
+  private final Object mLock = new Object();
+  private ArrayFilter mFilter;
+  public boolean buyerSelected = true;
+  public boolean sellerSelected = true;
+  public boolean tradeSelected = true;
+  public boolean infoSelected = true;
 
   public ExtendedArrayAdapter(Context context, ArrayList<CustomListMessage> values) {
     super(context, R.layout.rowlayout, values);
     this.context = context;
     this.messageList = values;
+    mOriginalValues = values;
   }
 
   @Override
@@ -57,57 +64,177 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 	}
     return v;
   }
+ // 
   
-  @SuppressLint("DefaultLocale")
   @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @SuppressWarnings("unchecked")
-            @Override
-            protected void publishResults(CharSequence constraint,
-                    FilterResults results) {
-                 
-                // Now we have to inform the adapter about the new list filtered
-                if (results.count == 0)
-                    notifyDataSetInvalidated();
-                else {
-              	  messageList = (ArrayList<CustomListMessage>) results.values;
-                    notifyDataSetChanged();
-                }
-                 
-            }
+  public int getCount() {
+      return messageList.size();
+  }
 
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                FilterResults results = new FilterResults();
-                // We implement here the filter logic
-                if (constraint == null || constraint.length() == 0) {
-                    // No filter implemented we return all the list
-                	results.count = messageList.size();
-                	results.values = messageList;
-                    
-                }
-                else {
-                    // We perform filtering operation
-              	  ArrayList<CustomListMessage> newMessageList = new ArrayList<CustomListMessage>();
-                     
-                    for (CustomListMessage p : messageList) {
-                        if (p.getBody().toUpperCase(Locale.US).contains(constraint.toString().toUpperCase())||
-                      		  p.getLocation().toUpperCase(Locale.US).contains(constraint.toString().toUpperCase())||
-                      		       p.getStatus().toUpperCase(Locale.US).contains(constraint.toString().toUpperCase()))
-                      	  newMessageList.add(p);
-                    }
-                     
-                    results.count = newMessageList.size();
-                    results.values = newMessageList;
-                    
-             
-                }
-                return results;
-            }
-        };
-    
-  } 
+
+  @Override
+  public CustomListMessage getItem(int position) {
+      return messageList.get(position);
+  }
+
   
- 
+  
+  public Filter getFilter() {
+	          if (mFilter == null) {
+	              mFilter = new ArrayFilter();
+	          }
+	          return mFilter;
+	      }
+  //overriden Search filter
+  private class ArrayFilter extends Filter {
+	          @Override
+	          protected FilterResults performFiltering(CharSequence prefix) {
+	              FilterResults results = new FilterResults();
+	  
+	              if (mOriginalValues == null) {
+	                  synchronized (mLock) {
+	                      mOriginalValues = messageList;
+	                  }
+	              }
+	  
+	              /*if ((prefix == null || prefix.length() == 0) && !buyerSelected && !sellerSelected && !tradeSelected && !infoSelected) {
+	                  synchronized (mLock) {
+	                      ArrayList<CustomListMessage> list = new ArrayList<CustomListMessage>(mOriginalValues);
+	                      results.values = list;
+	                      results.count = list.size();
+	                  }
+	              }
+	                  else*/ if(!buyerSelected || !sellerSelected || !tradeSelected || !infoSelected && (prefix == null || prefix.length() == 0))
+	                  {
+
+	                	  
+		                  final ArrayList<CustomListMessage> values = mOriginalValues;
+		                  final int count = values.size();
+		  
+		                  final ArrayList<CustomListMessage> newValues = new ArrayList<CustomListMessage>(count);
+		  
+		                  for (int i = 0; i < count; i++) {
+		                      final CustomListMessage value = values.get(i);
+
+		  
+		                      // First match against the whole, non-splitted value
+		                      
+		                      switch (value.getStatusEnum())
+		                      {case 1:
+		                    	  if(buyerSelected) {
+		    	                          newValues.add(value);
+		    	                      }
+		                    	  break;
+		                      case 2:
+		                    	  if(sellerSelected){
+		    	                          newValues.add(value);
+		    	                      }
+		                    	  break;
+		                      case 3:
+		                    	  if(tradeSelected){
+		    	                          newValues.add(value);
+		    	                      }
+		                    	  break;
+		                      case 4:
+		                    	  if(infoSelected){
+		    	                          newValues.add(value);
+		    	                       }
+		                    	  break;
+		                      
+		                      }
+		                     
+		                  }
+		  
+		                  results.values = newValues;
+		                  results.count = newValues.size();
+	                  }
+	               else {
+	                  String prefixString = prefix.toString().toLowerCase();
+	  
+	                  final ArrayList<CustomListMessage> values = mOriginalValues;
+	                  final int count = values.size();
+	  
+	                  final ArrayList<CustomListMessage> newValues = new ArrayList<CustomListMessage>(count);
+	  
+	                  for (int i = 0; i < count; i++) {
+	                      final CustomListMessage value = values.get(i);
+	                      final String valueText = value.messageToString().toLowerCase();
+	  
+	                      // First match against the whole, non-splitted value
+	                      
+	                      switch (value.getStatusEnum())
+	                      {case 1:
+	                    	  if(buyerSelected)
+	                    		  {if (valueText.contains(prefixString)) {
+	    	                          newValues.add(value);
+	    	                      } }
+	                    	  break;
+	                      case 2:
+	                    	  if(sellerSelected )
+	                    		  {if (valueText.contains(prefixString)) {
+	    	                          newValues.add(value);
+	    	                      } }
+	                    	  break;
+	                      case 3:
+	                    	  if(tradeSelected)
+	                    		  {if (valueText.contains(prefixString)) {
+	    	                          newValues.add(value);
+	    	                      } }
+	                    	  break;
+	                      case 4:
+	                    	  if(infoSelected)
+	                    		  {if (valueText.contains(prefixString)) {
+	    	                          newValues.add(value);
+	    	                      } }
+	                    	  break;
+	                      
+	                      }
+	                     
+	                  }
+	  
+	                  results.values = newValues;
+	                  results.count = newValues.size();
+	              }
+	  
+	              return results;
+	          }
+	  
+	       @SuppressWarnings("unchecked")
+		@Override
+	       protected void publishResults(CharSequence constraint, FilterResults results) {
+	           //noinspection unchecked
+	           messageList = (ArrayList<CustomListMessage>) results.values;
+	            if (results.count > 0) {
+	             notifyDataSetChanged();
+	           } else {
+               notifyDataSetInvalidated();
+	            }
+	          }
+	     }
+	 
+ //
+  
+  public boolean getBuyer()
+  {return buyerSelected;}
+  
+  public boolean getSeller()
+  {return sellerSelected;}
+  
+  public boolean getTrade()
+  {return tradeSelected;}
+  
+  public boolean getInfo()
+  {return infoSelected;}
+  
+  public void setBuyer(boolean state)
+  {buyerSelected = state;}
+  
+  public void setSeller(boolean state)
+  {buyerSelected = state;}
+  
+  public void setTrade(boolean state)
+  {buyerSelected = state;}
+  
+  public void setInfo(boolean state)
+  {buyerSelected = state;}
   }

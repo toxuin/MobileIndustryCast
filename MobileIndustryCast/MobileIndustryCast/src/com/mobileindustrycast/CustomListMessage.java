@@ -34,6 +34,10 @@ public class CustomListMessage {
 		messageType = type;
 	}
 	
+	public String messageToString()
+	{
+		return userName+" "+message+" "+location;
+	}
 	
 	//Adds Zulu timestamp to the custom message
     public String addTimestamp()
@@ -77,6 +81,22 @@ public class CustomListMessage {
 	public String getStatus()
 	{
 		return status;
+	}
+	
+	public int getStatusEnum()
+	{
+		int i=0;
+		
+		if (status.equals("Buyer"))
+		{i=1;}
+		else if (status.equals("Seller"))
+		{i=2;}
+		else if (status.equals("Trade"))
+		{i=3;}
+		else if (status.equals("Info"))
+		{i=4;}
+		
+		return i;
 	}
 	
 	public String getMessageType()
