@@ -25,5 +25,7 @@
     <string name="seller_toggle">Seller</string>
     <string name="trade_toggle">Trade</string>
     <string name="info_toggle">Info</string>
+    <string name="broadcast_btn">broadcast_btn</string>
+    
 
 </resources>

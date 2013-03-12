@@ -57,7 +57,7 @@ public class XMPP_setting extends Activity {
 	public  final String RECIPIENT = "industrycast@conference.velington-pc";
 	public  final String LOGIN="andrey";
 	public  final String PASSWORD="12345";
-	public  final String USERNAME="Testbot";
+
 
 
 	Message message;
@@ -99,23 +99,6 @@ public class XMPP_setting extends Activity {
 	}
     
     
-    //Adds Zulu timestamp and Username to the message body
-    public String extendedMessage(String message_body)
-    {
-    	Date messageDate = new Date();
-
-    	SimpleDateFormat hoursAmPm = new SimpleDateFormat("hh", Locale.US);
-    	SimpleDateFormat minutesAmPm = new SimpleDateFormat("mm", Locale.US);
-    	SimpleDateFormat lettersAmPm = new SimpleDateFormat("aa", Locale.US);
-
-    	StringBuilder hours = new StringBuilder(hoursAmPm.format(messageDate));
-    	StringBuilder minutes = new StringBuilder(minutesAmPm.format(messageDate));
-    	StringBuilder letters = new StringBuilder(lettersAmPm.format(messageDate));
-
-    	String exMessage = 	"["+hours+":"+minutes+" "+letters+"] "+ USERNAME+": "+message_body;
-    	
-    	return exMessage;
-	}
     
     //Function used to disconnect from the server connection(may be necessary if the server doesn't kick idle users) to be used in onDestruct()
     public void disconnect() {

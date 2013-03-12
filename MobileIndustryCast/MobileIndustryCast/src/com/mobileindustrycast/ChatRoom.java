@@ -18,7 +18,6 @@ import android.text.TextWatcher;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.text.Editable;
 import android.view.Menu;
 import android.view.View;
@@ -34,15 +33,19 @@ public class ChatRoom extends Activity  {
 	XMPP_setting xmpp = new XMPP_setting();
 	MultiUserChat muc; 
 	Message message;
-	ArrayList<String> messages = new ArrayList<String>();
+	ArrayList<CustomListMessage> msg = new ArrayList<CustomListMessage>();
 	private Handler mHandler = new Handler();
+	String USERNAME="Testbot";
+	String userLocation = "BC";
+	String userStatus = "buyer";
 	
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);       
-        Button button = (Button) findViewById(R.id.post_btn);
+        Button post_button = (Button) findViewById(R.id.post_btn);
+        Button broadcast_button = (Button) findViewById(R.id.broadcast_btn);
 					
 		//Working Thread that's associated with networking function login()
 		new Thread(new Runnable() {
@@ -55,10 +58,10 @@ public class ChatRoom extends Activity  {
 					System.out.println(ex.toString());
 				}
 				
-				//Setting up message listener
+				//Setting up message listener, listener parameters for message packets require adapter to be used in UI Thread
 				muc  = new MultiUserChat(xmpp.connection, xmpp.RECIPIENT);
 			    try{
-				muc.join(xmpp.USERNAME);//To include preferred user name(constrains may apply)
+				muc.join(USERNAME);//To include preferred user name(constrains may apply)
 		        ConsumerMUCMessageListener listener = new ConsumerMUCMessageListener();
 		        muc.addMessageListener(listener);
 			    } catch (XMPPException ex) {
@@ -75,19 +78,43 @@ public class ChatRoom extends Activity  {
         createListAdapter();
 
 		//Post button event. Sends message with user defined body to the Openfire Server
-		button.setOnClickListener(new OnClickListener() {
+		post_button.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				System.out.println("Button pressed event occured");
 
-				String message = ((EditText) findViewById(R.id.post_text)).getText().toString();//getting message body from user input
-				System.out.println("Text from the text field: " + message);
-				
+				String body = ((EditText) findViewById(R.id.post_text)).getText().toString();//getting message body from user input
+				CustomListMessage message = new CustomListMessage(USERNAME, body, userLocation);
+			
+
 				//if text fiend is not empty sends the message to the server in for of extended message(timestamp and uresname are included in the message body)
-				if (message!="")
+				if (message.getBody()!="")
 				{
 					try 
 					{
-						sendMessage(xmpp.extendedMessage(message)); 
+						sendMessage(messageContsructor(message)); 
+						((EditText) findViewById(R.id.post_text)).setText("");
+					} 
+					catch (XMPPException e) 
+					{
+						System.out.println(e.toString());
+					}
+				}
+
+			}
+		});
+		
+		broadcast_button.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+
+				String body = ((EditText) findViewById(R.id.post_text)).getText().toString();//getting message body from user input
+				CustomListMessage message = new CustomListMessage(USERNAME, body, userLocation, userStatus, "broadcast");
+			
+
+				//if text fiend is not empty sends the message to the server in for of extended message(timestamp and uresname are included in the message body)
+				if (message.getBody()!="")
+				{
+					try 
+					{
+						sendMessage(messageContsructor(message)); 
 						((EditText) findViewById(R.id.post_text)).setText("");
 					} 
 					catch (XMPPException e) 
@@ -125,7 +152,7 @@ public class ChatRoom extends Activity  {
     	final ListView mlist = (ListView) findViewById(R.id.messagesListView);
     	mlist.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
     	mlist.setStackFromBottom(true);
-	    ArrayAdapter<String> adapter = new ArrayAdapter<String> (this, android.R.layout.simple_list_item_1, messages);
+	    ExtendedArrayAdapter adapter = new ExtendedArrayAdapter(this, msg);
 		mlist.setAdapter(adapter);
 		adapter.notifyDataSetChanged();
 
@@ -147,6 +174,29 @@ public class ChatRoom extends Activity  {
 
     }
     
+    public static String messageContsructor(CustomListMessage msg)
+    {
+    	String message = "#timestamp "+msg.getTimestamp()+" timestamp#"
+    			+"#userName "+msg.getUserName()+" userName#"
+    			+"#message "+msg.getBody()+" message#"
+    			+"#location "+msg.getLocation()+" location#"
+    			+"#status "+msg.getStatus()+" status#"
+    			+"#messageType "+msg.getMessageType()+" messageType#";
+    	return message;
+    }
+    
+    public static CustomListMessage messageDeConstructor(String message)
+    {
+    	CustomListMessage msg = new CustomListMessage(message.substring(message.indexOf("#userName ")+"#userName ".length(),message.indexOf(" userName#")),
+    			message.substring(message.indexOf("#message ")+"#message ".length(),message.indexOf(" message#")),
+    			message.substring(message.indexOf("#location ")+"#location ".length(),message.indexOf(" location#")),
+    			message.substring(message.indexOf("#status ")+"#status ".length(),message.indexOf(" status#")),
+    			message.substring(message.indexOf("#messageType ")+"#messageType ".length(),message.indexOf(" messageType#")));
+    	
+    	msg.setTimestamp(message.substring(message.indexOf("#timestamp ")+"#timestamp ".length(),message.indexOf(" timestamp#")));
+    	return msg;
+    }
+    
     //Multi-User Chat listener class, necessary for packet(message type in this case) retrieval from the server. Adds messages received to the "messages" array
     class ConsumerMUCMessageListener implements PacketListener {
  
@@ -155,7 +205,7 @@ public class ChatRoom extends Activity  {
             if ( packet instanceof Message) {
             	message = (Message) packet;
             	
-   				messages.add(message.getBody());
+   				msg.add(messageDeConstructor(message.getBody()));
                 System.out.println(message.getFrom() +": " + message.getBody());
                 // Add the incoming message to the list view(crashes the application currently)
                 mHandler.post(new Runnable() {
@@ -167,7 +217,7 @@ public class ChatRoom extends Activity  {
         }
 
     }
-    
+
     protected void onDestroy()
     {
     	xmpp.disconnect();
