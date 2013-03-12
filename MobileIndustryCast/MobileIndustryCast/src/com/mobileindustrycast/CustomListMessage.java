@@ -20,7 +20,7 @@ public class CustomListMessage {
 		userName=user;
 		message=msg;
 		location=loc;
-		status="Need Iinfo";
+		status="Info";
 		messageType = "post";
 	}
 	

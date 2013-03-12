@@ -1,47 +1,16 @@
 package com.mobileindustrycast;
 
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Locale;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
-import org.jivesoftware.smack.ChatManager;
+
 import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.MessageListener;
-import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.PacketExtension;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.filter.AndFilter;
-import org.jivesoftware.smack.filter.FromContainsFilter;
-import org.jivesoftware.smack.filter.MessageTypeFilter;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.util.StringUtils;
-import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.packet.DelayInformation;
-import org.jivesoftware.smackx.pubsub.EventElement;
+
 
 
 

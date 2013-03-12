@@ -87,7 +87,7 @@
                         android:textOn="@string/trade_toggle" />
 
                     <ToggleButton
-                        android:id="@+id/toggleButton4"
+                        android:id="@+id/toggle_info"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/info_toggle"
@@ -125,14 +125,15 @@
                         android:id="@+id/post_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/post_button" />
+                        android:text="@string/post_button"
+                        android:textSize="14sp" />
 
                     <Button
                         android:id="@+id/broadcast_btn"
                         style="?android:attr/buttonStyleSmall"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Broadcast" />
+                        android:text="@string/Broadcast" />
 
                 </LinearLayout>
 

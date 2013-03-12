@@ -16,18 +16,20 @@ import com.mobileindustrycast.XMPP_setting;
 
 import android.text.TextWatcher;
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.view.Menu;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ToggleButton;
 import android.view.View.OnClickListener;
 
-public class ChatRoom extends Activity  {
+public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogListener {
 
 	
 	XMPP_setting xmpp = new XMPP_setting();
@@ -37,15 +39,76 @@ public class ChatRoom extends Activity  {
 	private Handler mHandler = new Handler();
 	String USERNAME="Testbot";
 	String userLocation = "BC";
-	String userStatus = "buyer";
+	String userStatus = "Buyer";
+	boolean isBuyer = false;
+	boolean isSeller = false;
+	boolean isTrade = false;
+	boolean isInfo = false;
+    
+	ExtendedArrayAdapter adapter;
 	
+	BroadcastDialog dialog = new BroadcastDialog();
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat_room);       
+        setContentView(R.layout.activity_chat_room);  
+       
+    	
+        adapter = new ExtendedArrayAdapter(this, msg);
+        
         Button post_button = (Button) findViewById(R.id.post_btn);
         Button broadcast_button = (Button) findViewById(R.id.broadcast_btn);
+        
+        ToggleButton buyer = (ToggleButton) findViewById(R.id.toggle_buyer);
+        ToggleButton seller = (ToggleButton) findViewById(R.id.toggle_seller);
+        ToggleButton trade = (ToggleButton) findViewById(R.id.toggle_trade);
+        ToggleButton info = (ToggleButton) findViewById(R.id.toggle_info);
+        
+        buyer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    isBuyer = true;
+                    adapter.getFilter().filter("Buyer");
+                } else {
+                	isBuyer = false;
+                	adapter.getFilter().filter("");
+                }
+            }
+        });
+        
+        seller.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    isSeller = true;
+                    adapter.getFilter().filter("Seller");
+                } else {
+                	isSeller = false;
+                }
+            }
+        });
+        
+        trade.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    isTrade = true;
+                } else {
+                	isTrade = false;
+                }
+            }
+        });
+        
+        info.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    isInfo = true;
+                } else {
+                	isInfo = false;
+                }
+            }
+        });
+
+       
 					
 		//Working Thread that's associated with networking function login()
 		new Thread(new Runnable() {
@@ -105,23 +168,9 @@ public class ChatRoom extends Activity  {
 		broadcast_button.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 
-				String body = ((EditText) findViewById(R.id.post_text)).getText().toString();//getting message body from user input
-				CustomListMessage message = new CustomListMessage(USERNAME, body, userLocation, userStatus, "broadcast");
-			
-
-				//if text fiend is not empty sends the message to the server in for of extended message(timestamp and uresname are included in the message body)
-				if (message.getBody()!="")
-				{
-					try 
-					{
-						sendMessage(messageContsructor(message)); 
-						((EditText) findViewById(R.id.post_text)).setText("");
-					} 
-					catch (XMPPException e) 
-					{
-						System.out.println(e.toString());
-					}
-				}
+				showBroadcastDialog();
+				
+				
 
 			}
 		});
@@ -131,12 +180,15 @@ public class ChatRoom extends Activity  {
         EditText searchWords = (EditText) findViewById(R.id.search_text);
         searchWords.addTextChangedListener(new TextWatcher() {
 
+        @Override
         public void afterTextChanged(Editable s) {}
 
+        @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
+        
+        @Override
 		public void onTextChanged(CharSequence s, int start,int before, int count) {
-			
+        	adapter.getFilter().filter(s.toString());
 		}
 		});}
             
@@ -148,14 +200,12 @@ public class ChatRoom extends Activity  {
     }
     
     public void createListAdapter()
-    {
-    	final ListView mlist = (ListView) findViewById(R.id.messagesListView);
-    	mlist.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
+    {  	
+    	final ListView mlist =(ListView) findViewById(R.id.messagesListView);
+    	//mlist.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
     	mlist.setStackFromBottom(true);
-	    ExtendedArrayAdapter adapter = new ExtendedArrayAdapter(this, msg);
-		mlist.setAdapter(adapter);
+    	mlist.setAdapter(adapter);
 		adapter.notifyDataSetChanged();
-
     }
 
   //sending message to the Multi-User Chat
@@ -195,6 +245,56 @@ public class ChatRoom extends Activity  {
     	
     	msg.setTimestamp(message.substring(message.indexOf("#timestamp ")+"#timestamp ".length(),message.indexOf(" timestamp#")));
     	return msg;
+    }
+    
+    //broadcast dialog supporting functions
+    public void showBroadcastDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new BroadcastDialog();
+        dialog.show(getFragmentManager(), "Broadcast");
+    }
+    
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        // User touched the buy button
+    	userStatus="Buyer";
+    	sendBroadcastMessage();
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        // User touched the trade button
+      userStatus="Trade";
+      sendBroadcastMessage();
+    }
+    
+    @Override
+    public void onDialogNeutralClick(DialogFragment dialog) {
+        // User touched the sell button
+    	userStatus="Seller";
+    	sendBroadcastMessage();
+      
+    }
+    
+    public void sendBroadcastMessage()
+    {
+    	String body = ((EditText) findViewById(R.id.post_text)).getText().toString();//getting message body from user input
+		CustomListMessage message = new CustomListMessage(USERNAME, body, userLocation, userStatus, "broadcast");
+	
+
+		//if text fiend is not empty sends the message to the server in for of extended message(timestamp and uresname are included in the message body)
+		if (message.getBody()!="")
+		{
+			try 
+			{
+				sendMessage(messageContsructor(message)); 
+				((EditText) findViewById(R.id.post_text)).setText("");
+			} 
+			catch (XMPPException e) 
+			{
+				System.out.println(e.toString());
+			}
+		}
     }
     
     //Multi-User Chat listener class, necessary for packet(message type in this case) retrieval from the server. Adds messages received to the "messages" array
