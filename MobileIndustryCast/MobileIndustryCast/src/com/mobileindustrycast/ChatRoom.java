@@ -310,16 +310,11 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
 
 		public void processPacket(Packet packet) {
             if ( packet instanceof Message) {
-            	message = (Message) packet;
-            	
-   				msg.add(messageDeConstructor(message.getBody()));
+            	message = (Message) packet;	
                 System.out.println(message.getFrom() +": " + messageDeConstructor(message.getBody()).messageToString());
-                // Add the incoming message to the list view(crashes the application currently)
-                mHandler.post(new Runnable() {
-                    public void run() {
-                   	createListAdapter();              	
-                    }
-                  });
+                // Add the incoming message to the list view
+                adapter.add(messageDeConstructor(message.getBody()));
+                adapter.notifyDataSetChanged();
             }
         }
 
