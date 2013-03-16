@@ -17,7 +17,6 @@ import com.mobileindustrycast.XMPP_setting;
 import android.text.TextWatcher;
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -32,20 +31,19 @@ import android.view.View.OnClickListener;
 
 public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogListener {
 
-	
+	Handler mHandler;
 	XMPP_setting xmpp = new XMPP_setting();
 	MultiUserChat muc; 
 	Message message;
 	ArrayList<CustomListMessage> msg = new ArrayList<CustomListMessage>();
-	private Handler mHandler = new Handler();
-
-	String USERNAME="Boris";
+	String USERNAME="Boris_the_Great";
 	String userLocation = "Soviet Russia";
 	String userStatus = "Buyer";
 
 	String filter ="";
     
 	ExtendedArrayAdapter adapter;
+	ListView mlist;
 	
 	BroadcastDialog dialog = new BroadcastDialog();
 	
@@ -53,14 +51,15 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);  
-//       
-//        savedInstanceState.getString();
-//        savedInstanceState.getString();
-//        savedInstanceState.getString();
-        
-        
+       	
         adapter = new ExtendedArrayAdapter(this, msg);
-        
+        mlist =(ListView) findViewById(R.id.messagesListView);
+    	mlist.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
+    	//mlist.setStackFromBottom(true);
+    	mlist.setAdapter(adapter);
+		//adapter.notifyDataSetChanged();
+
+		
         Button post_button = (Button) findViewById(R.id.post_btn);
         Button broadcast_button = (Button) findViewById(R.id.broadcast_btn);
         
@@ -129,13 +128,6 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
 					xmpp.login();
 				} catch (XMPPException ex) {
 					System.out.println(ex.toString());
-					
-					//This is supposed to take back to login page if something fails
-					Intent goBack = new Intent(getApplicationContext(), loginActivity.class);
-					
-					
-					
-					startActivity(goBack);
 				}
 				
 				//Setting up message listener, listener parameters for message packets require adapter to be used in UI Thread
@@ -155,7 +147,7 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
 			}
 		}).start();
 		
-        createListAdapter();
+      
 
 		//Post button event. Sends message with user defined body to the Openfire Server
 		post_button.setOnClickListener(new OnClickListener() {
@@ -223,17 +215,14 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
     
     public void createListAdapter()
     {  	
-    	final ListView mlist =(ListView) findViewById(R.id.messagesListView);
-    	mlist.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
-    	mlist.setStackFromBottom(true);
+    	adapter = new ExtendedArrayAdapter(this, msg);
     	mlist.setAdapter(adapter);
 		adapter.notifyDataSetChanged();
-	//	adapter.getFilter().filter(filter);
     }
 
   //sending message to the Multi-User Chat
     public void sendMessage(String message_body) throws XMPPException {
-    	System.out.println("XMPP_setting class' function 'sendMessage' started");
+    	System.out.println("function 'sendMessage' started");
         
             try
             {
@@ -317,25 +306,32 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
 			}
     }
     
-    //Multi-User Chat listener class, necessary for packet(message type in this case) retrieval from the server. Adds messages received to the "messages" array
+    protected void onDestroy()
+    {
+    	xmpp.disconnect();
+    }
+    
+    
+    
+    //Multi-User Chat listener class, necessary for packet(message type in this case) retrieval from the server. Adds messages received to the "messages" array  
     class ConsumerMUCMessageListener implements PacketListener {
  
-
+    
+    	
 		public void processPacket(Packet packet) {
             if ( packet instanceof Message) {
             	message = (Message) packet;	
                 System.out.println(message.getFrom() +": " + messageDeConstructor(message.getBody()).messageToString());
                 // Add the incoming message to the list view
-                adapter.add(messageDeConstructor(message.getBody()));
-                adapter.notifyDataSetChanged();
-            }
-        }
+                final CustomListMessage messageObject = messageDeConstructor(message.getBody());
+                runOnUiThread(new Runnable() {         
+                    public void run() {
+                adapter.add(messageObject); 
+                    }
+                });
+                adapter.getFilter().filter(filter);
+           }          
+		}
+    }   
 
-    }
-
-    protected void onDestroy()
-    {
-    	xmpp.disconnect();
-    }
 }
-

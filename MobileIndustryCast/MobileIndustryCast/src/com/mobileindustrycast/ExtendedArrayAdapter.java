@@ -18,20 +18,28 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
   private Context context;
   private ArrayList<CustomListMessage> messageList;
   private ArrayList<CustomListMessage> mOriginalValues;
-  private final Object mLock = new Object();
   private ArrayFilter mFilter;
   public boolean buyerSelected = true;
   public boolean sellerSelected = true;
   public boolean tradeSelected = true;
   public boolean infoSelected = true;
-
+  
+  private boolean mNotifyOnChange = true;
+  public boolean isFiltered = false;
+  
   public ExtendedArrayAdapter(Context context, ArrayList<CustomListMessage> values) {
     super(context, R.layout.rowlayout, values);
     this.context = context;
     this.messageList = values;
-    mOriginalValues = values;
+    this.mOriginalValues = values;
   }
 
+
+  static class ViewHolder {
+	    public  TextView text;
+	    public   ImageView image;
+	  }
+  
   @Override
   public View getView(int position, View convertView, ViewGroup parent) {
     
@@ -39,32 +47,41 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 
 	  
 	if (convertView == null){
-	LayoutInflater inflater = (LayoutInflater) context
-        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);  
+	LayoutInflater inflater = (LayoutInflater) context .getSystemService(Context.LAYOUT_INFLATER_SERVICE);  
     v = inflater.inflate(R.layout.rowlayout, parent, false);
+    ViewHolder viewHolder = new ViewHolder();
+    viewHolder.text = (TextView) v.findViewById(R.id.label);
+    viewHolder.image = (ImageView) v
+        .findViewById(R.id.icon);
+    v.setTag(viewHolder);
     }
 
-	TextView textView = (TextView) v.findViewById(R.id.label);
-	ImageView imageView = (ImageView) v.findViewById(R.id.icon);
+	ViewHolder holder = (ViewHolder) v.getTag();
     
 	
 	CustomListMessage message;
 	if (position<messageList.size())
 	{message = messageList.get(position);
     
-    textView.setText(message.getTimestamp()+" "+message.getUserName()+", "+message.getLocation()+", "+message.getStatus()+": "+message.getBody());
+    holder.text.setText(message.getTimestamp()+" "+message.getUserName()+", "+message.getLocation()+", "+message.getStatus()+": "+message.getBody());
     
     // Change the icon/color for broadcast/post messages(with post type as a default one)
-    imageView.setImageResource(R.drawable.post);
-    textView.setTextColor(Color.parseColor("#90CA77"));
+    holder.image.setImageResource(R.drawable.post);
+    holder.text.setTextColor(Color.parseColor("#90CA77"));
     
     if (message.getMessageType().equals("broadcast")) {
-      imageView.setImageResource(R.drawable.broadcast);
-      textView.setTextColor(Color.parseColor("#9E3B33"));}
+      holder.image.setImageResource(R.drawable.broadcast);
+      holder.text.setTextColor(Color.parseColor("#9E3B33"));}
 	}
     return v;
   }
  // 
+  
+  @Override
+  public Context getContext(){
+	  return context;
+  }
+  
   
   @Override
   public int getCount() {
@@ -77,7 +94,17 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
       return messageList.get(position);
   }
 
+  @Override
+ public int getPosition(CustomListMessage item) 
+  {
+	  return messageList.indexOf(item);
+  }
   
+  @Override
+  public long getItemId(int position)
+  {
+	  return position;
+  }
   
   public Filter getFilter() {
 	          if (mFilter == null) {
@@ -92,19 +119,20 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 	              FilterResults results = new FilterResults();
 	  
 	              if (mOriginalValues == null) {
-	                  synchronized (mLock) {
+	                 // synchronized (mLock) {
 	                      mOriginalValues = messageList;
-	                  }
+	                  //}
 	              }
 	  
-	              /*if ((prefix == null || prefix.length() == 0) && !buyerSelected && !sellerSelected && !tradeSelected && !infoSelected) {
-	                  synchronized (mLock) {
+	              if ((prefix == null || prefix.length() == 0) && buyerSelected && sellerSelected && tradeSelected && infoSelected) {
+	                 // synchronized (mLock) {
 	                      ArrayList<CustomListMessage> list = new ArrayList<CustomListMessage>(mOriginalValues);
 	                      results.values = list;
 	                      results.count = list.size();
-	                  }
+	                      isFiltered = false;
+	                  //}
 	              }
-	                  else*/ if(!buyerSelected || !sellerSelected || !tradeSelected || !infoSelected && (prefix == null || prefix.length() == 0))
+	                  else if(!buyerSelected || !sellerSelected || !tradeSelected || !infoSelected && (prefix == null || prefix.length() == 0))
 	                  {
 
 	                	  
@@ -123,7 +151,6 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 		                      {case 1:
 		                    	  if(buyerSelected) {
 		    	                          newValues.add(value);
-		    	                          
 		    	                      }
 		                    	  break;
 		                      case 2:
@@ -148,6 +175,7 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 		  
 		                  results.values = newValues;
 		                  results.count = newValues.size();
+		                  isFiltered = true;
 	                  }
 	               else {
 	                  String prefixString = prefix.toString().toLowerCase();
@@ -196,7 +224,8 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 	                  results.values = newValues;
 	                  results.count = newValues.size();
 	              }
-	  
+	              
+	              isFiltered = true;
 	              return results;
 	          }
 	  
@@ -214,6 +243,22 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 	     }
 	 
  //
+  public void add(CustomListMessage object) {
+	          /*if (mOriginalValues != null) {
+	           //   synchronized (mLock) {
+	                  mOriginalValues.add(object);
+	                  if (mNotifyOnChange) notifyDataSetChanged();
+	           //   }
+	          } else {*/
+	              messageList.add(object);
+	              if (mNotifyOnChange) notifyDataSetChanged();
+	        /*  }*/
+	      }
+  
+  public void notifyDataSetChanged() {
+	          super.notifyDataSetChanged();
+	          mNotifyOnChange = true;
+	      }
   
   public boolean getBuyer()
   {return buyerSelected;}
