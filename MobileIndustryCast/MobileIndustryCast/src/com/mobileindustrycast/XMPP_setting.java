@@ -20,12 +20,12 @@ import org.jivesoftware.smack.packet.Message;
  */
 public class XMPP_setting extends Activity {
     //for final server use
-	public  final String HOST = "Velington-PC";//"http://velington-pc"
+	public  final String HOST = "192.168.1.116";//"http://velington-pc"
 	public  final int PORT_NUMBER = 5222 ;
 	public  final String SERVICE = "conference.velington-pc";
 	public  final String RECIPIENT = "industrycast@conference.velington-pc";
-	public  final String LOGIN="andrey";
-	public  final String PASSWORD="12345";
+	public  final String LOGIN="daniel";
+	public  final String PASSWORD="23456";
 
 
 

@@ -17,6 +17,7 @@ import com.mobileindustrycast.XMPP_setting;
 import android.text.TextWatcher;
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -37,7 +38,7 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
 	Message message;
 	ArrayList<CustomListMessage> msg = new ArrayList<CustomListMessage>();
 	private Handler mHandler = new Handler();
-	String USERNAME="Testbot";
+	String USERNAME="Daniel";
 	String userLocation = "BC";
 	String userStatus = "Buyer";
 
@@ -51,8 +52,12 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);  
-       
-    	
+//       
+//        savedInstanceState.getString();
+//        savedInstanceState.getString();
+//        savedInstanceState.getString();
+        
+        
         adapter = new ExtendedArrayAdapter(this, msg);
         
         Button post_button = (Button) findViewById(R.id.post_btn);
@@ -123,6 +128,13 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
 					xmpp.login();
 				} catch (XMPPException ex) {
 					System.out.println(ex.toString());
+					
+					//This is supposed to take back to login page if something fails
+					Intent goBack = new Intent(getApplicationContext(), loginActivity.class);
+					
+					
+					
+					startActivity(goBack);
 				}
 				
 				//Setting up message listener, listener parameters for message packets require adapter to be used in UI Thread
