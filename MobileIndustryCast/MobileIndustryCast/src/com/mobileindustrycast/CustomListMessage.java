@@ -36,7 +36,7 @@ public class CustomListMessage {
 	
 	public String messageToString()
 	{
-		return userName+" "+message+" "+location;
+		return userName+" "+location+" "+message;
 	}
 	
 	//Adds Zulu timestamp to the custom message

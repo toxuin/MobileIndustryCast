@@ -151,7 +151,8 @@
             android:id="@+id/messagesListView"
             android:layout_width="242dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1.22" >
+            android:layout_weight="1.15" 
+            >
 
         </ListView>
 
