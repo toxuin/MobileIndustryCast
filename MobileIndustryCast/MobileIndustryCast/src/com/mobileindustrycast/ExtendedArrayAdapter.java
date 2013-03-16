@@ -25,13 +25,12 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
   public boolean infoSelected = true;
   
   private boolean mNotifyOnChange = true;
-  public boolean isFiltered = false;
+
   
   public ExtendedArrayAdapter(Context context, ArrayList<CustomListMessage> values) {
     super(context, R.layout.rowlayout, values);
     this.context = context;
     this.messageList = values;
-    this.mOriginalValues = values;
   }
 
 
@@ -112,7 +111,7 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 	          }
 	          return mFilter;
 	      }
-  //overriden Search filter
+ 
   private class ArrayFilter extends Filter {
 	          @Override
 	          protected FilterResults performFiltering(CharSequence prefix) {
@@ -129,7 +128,6 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 	                      ArrayList<CustomListMessage> list = new ArrayList<CustomListMessage>(mOriginalValues);
 	                      results.values = list;
 	                      results.count = list.size();
-	                      isFiltered = false;
 	                  //}
 	              }
 	                  else if(!buyerSelected || !sellerSelected || !tradeSelected || !infoSelected && (prefix == null || prefix.length() == 0))
@@ -144,8 +142,6 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 		                  for (int i = 0; i < count; i++) {
 		                      final CustomListMessage value = values.get(i);
 
-		  
-		                      // First match against the whole, non-splitted value
 		                      
 		                      switch (value.getStatusEnum())
 		                      {case 1:
@@ -175,7 +171,6 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 		  
 		                  results.values = newValues;
 		                  results.count = newValues.size();
-		                  isFiltered = true;
 	                  }
 	               else {
 	                  String prefixString = prefix.toString().toLowerCase();
@@ -189,8 +184,7 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 	                      final CustomListMessage value = values.get(i);
 	                      final String valueText = value.messageToString().toLowerCase();
 	  
-	                      // First match against the whole, non-splitted value
-	                      
+
 	                      switch (value.getStatusEnum())
 	                      {case 1:
 	                    	  if(buyerSelected)
@@ -225,7 +219,6 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 	                  results.count = newValues.size();
 	              }
 	              
-	              isFiltered = true;
 	              return results;
 	          }
 	  
@@ -242,17 +235,17 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 	          }
 	     }
 	 
- //
+ //user is able to see what he types in filtered listView, filters do not apply to his messages to 
+  //avoid problems(user must see his inputs)
   public void add(CustomListMessage object) {
-	          /*if (mOriginalValues != null) {
-	           //   synchronized (mLock) {
+	          if (mOriginalValues != null) {	             
 	                  mOriginalValues.add(object);
+	                  messageList.add(object);
 	                  if (mNotifyOnChange) notifyDataSetChanged();
-	           //   }
-	          } else {*/
+	          } else {
 	              messageList.add(object);
 	              if (mNotifyOnChange) notifyDataSetChanged();
-	        /*  }*/
+	          }
 	      }
   
   public void notifyDataSetChanged() {

@@ -329,7 +329,7 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
                 adapter.add(messageObject); 
                     }
                 });
-                adapter.getFilter().filter(filter);
+                
            }          
 		}
     }   

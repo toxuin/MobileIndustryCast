@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 public class loginActivity extends Activity{
-	
+/*	
 	String USERNAME="Testbot";
 	String PASSWORD = "";
 	String userLocation = "BC";
@@ -34,5 +34,5 @@ public class loginActivity extends Activity{
 		login.putExtras(bundle);
 	
         startActivity(login);
-	}
+	}*/
 }
