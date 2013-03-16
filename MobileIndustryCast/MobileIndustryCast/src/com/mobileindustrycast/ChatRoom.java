@@ -215,6 +215,7 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
     	mlist.setStackFromBottom(true);
     	mlist.setAdapter(adapter);
 		adapter.notifyDataSetChanged();
+	//	adapter.getFilter().filter(filter);
     }
 
   //sending message to the Multi-User Chat
@@ -316,8 +317,7 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
                 // Add the incoming message to the list view(crashes the application currently)
                 mHandler.post(new Runnable() {
                     public void run() {
-                   	createListAdapter();
-                   	adapter.getFilter().filter(filter);
+                   	createListAdapter();              	
                     }
                   });
             }

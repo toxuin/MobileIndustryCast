@@ -123,6 +123,7 @@ public class ExtendedArrayAdapter extends ArrayAdapter<CustomListMessage> {
 		                      {case 1:
 		                    	  if(buyerSelected) {
 		    	                          newValues.add(value);
+		    	                          
 		    	                      }
 		                    	  break;
 		                      case 2:
