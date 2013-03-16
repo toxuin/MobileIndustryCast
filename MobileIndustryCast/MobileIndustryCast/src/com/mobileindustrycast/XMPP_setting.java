@@ -24,8 +24,10 @@ public class XMPP_setting extends Activity {
 	public  final int PORT_NUMBER = 5222 ;
 	public  final String SERVICE = "conference.velington-pc";
 	public  final String RECIPIENT = "industrycast@conference.velington-pc";
+
 	public  final String LOGIN="boris";
 	public  final String PASSWORD="malkoy666";
+
 
 
 
