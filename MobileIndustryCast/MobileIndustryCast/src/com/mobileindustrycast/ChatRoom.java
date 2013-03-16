@@ -37,8 +37,8 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
 	Message message;
 	ArrayList<CustomListMessage> msg = new ArrayList<CustomListMessage>();
 	private Handler mHandler = new Handler();
-	String USERNAME="Testbot";
-	String userLocation = "BC";
+	String USERNAME="Boris";
+	String userLocation = "Soviet Russia";
 	String userStatus = "Buyer";
 
 	String filter ="";
@@ -152,9 +152,10 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
 				CustomListMessage message = new CustomListMessage(USERNAME, body, userLocation);
 			
 
-				//if text fiend is not empty sends the message to the server in for of extended message(timestamp and uresname are included in the message body)
-				if (message.getBody()!="")
+				//if text fiend is not empty sends the message to the server in for of extended message(timestamp and username are included in the message body)
+				if (body!=null && body.length()!=0)
 				{
+					System.out.println("body: "+body);
 					try 
 					{
 						sendMessage(messageContsructor(message)); 
@@ -172,10 +173,13 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
 		broadcast_button.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 
+				String body = ((EditText) findViewById(R.id.post_text)).getText().toString();
+				
+				if (body.length()!=0 && body!=null)
+				{
 				showBroadcastDialog();
+				}
 				
-				
-
 			}
 		});
 
@@ -207,7 +211,7 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
     public void createListAdapter()
     {  	
     	final ListView mlist =(ListView) findViewById(R.id.messagesListView);
-    	//mlist.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
+    	mlist.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
     	mlist.setStackFromBottom(true);
     	mlist.setAdapter(adapter);
 		adapter.notifyDataSetChanged();
@@ -270,7 +274,7 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
     public void onDialogNegativeClick(DialogFragment dialog) {
         // User touched the trade button
       userStatus="Trade";
-      sendBroadcastMessage();
+  	  sendBroadcastMessage();
     }
     
     @Override
@@ -288,8 +292,6 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
 	
 
 		//if text fiend is not empty sends the message to the server in for of extended message(timestamp and uresname are included in the message body)
-		if (message.getBody()!="")
-		{
 			try 
 			{
 				sendMessage(messageContsructor(message)); 
@@ -299,7 +301,6 @@ public class ChatRoom extends Activity implements BroadcastDialog.NoticeDialogLi
 			{
 				System.out.println(e.toString());
 			}
-		}
     }
     
     //Multi-User Chat listener class, necessary for packet(message type in this case) retrieval from the server. Adds messages received to the "messages" array
