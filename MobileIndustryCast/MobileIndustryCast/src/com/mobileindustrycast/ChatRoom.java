@@ -4,9 +4,7 @@ package com.mobileindustrycast;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.MessageListener;
-import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 
@@ -16,6 +14,8 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.view.View.OnClickListener;
+
+import java.util.Collection;
 
 public class ChatRoom extends Activity implements MessageListener {
 
@@ -108,6 +108,18 @@ public class ChatRoom extends Activity implements MessageListener {
             logView.setText(logView.getText() + "\n NO CONNECTION");
         }
 
+    }
+
+    public void displayBuddyList()
+    {
+        Roster roster = xmpp.connection.getRoster();
+        Collection<RosterEntry> entries = roster.getEntries();
+
+        Log.d("OLOLO", "\n\n" + entries.size() + " buddy(ies):");
+        for (RosterEntry r:entries)
+        {
+            Log.d("OLOLO", r.getUser());
+        }
     }
 
     // INCOMING MESSAGES
