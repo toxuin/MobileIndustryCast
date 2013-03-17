@@ -9,7 +9,7 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
+import android.util.Log;
 
 
 
@@ -20,28 +20,21 @@ import org.jivesoftware.smack.packet.Message;
  */
 public class XMPP_setting extends Activity {
     //for final server use
-	public  final String HOST = "192.168.1.116";//"http://velington-pc"
+	public  final String HOST = "SERVER.ru";
 	public  final int PORT_NUMBER = 5222 ;
-	public  final String SERVICE = "conference.velington-pc";
-	public  final String RECIPIENT = "industrycast@conference.velington-pc";
+	public  final String SERVICE = "service_name";
 
-	public  final String LOGIN="boris";
-	public  final String PASSWORD="malkoy666";
+	public  final String LOGIN="awesome_login";
+	public  final String PASSWORD="1234";
 
-
-
-
-	Message message;
-
-
-	XMPPConnection connection;	  
+	XMPPConnection connection;
 	
 		
 	public void connect()
 	{	
 		
 		//Configuring connection parameters with the setting predefined by team or user's input if available
-		ConnectionConfiguration config = new ConnectionConfiguration(HOST,PORT_NUMBER, SERVICE);
+		ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT_NUMBER, SERVICE);
 		
 		// config.setDebuggerEnabled(true); <--helpful if you are encountering a problem on the XMPP side(LogCat output)
 
@@ -53,8 +46,8 @@ public class XMPP_setting extends Activity {
 			SASLAuthentication.supportSASLMechanism("PLAIN", 0);
 			connection.connect();
 		} catch (XMPPException ex) {
-			System.out.println("Exception at connect");
-			System.out.println(ex.toString());
+			Log.d("OLOLO", "Exception at connect");
+			Log.d("OLOLO", ex.toString());
 		}
 	}
 	
@@ -63,9 +56,9 @@ public class XMPP_setting extends Activity {
 
 		try {
 			//user login. Needs to match the data from the DB associated with OpenFire Server
-			connection.login(LOGIN, PASSWORD);						
+			connection.login(LOGIN, PASSWORD);
 		} catch (XMPPException ex) {
-			System.out.println(ex.toString());
+			Log.d("OLOLO", ex.toString());
 		}
 	}
     

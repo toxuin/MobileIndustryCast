@@ -213,3 +213,16 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+# idea conf files
+.idea/
+.idea
+*.iml
+*.ipr
+*.iws
+
+# generated files
+bin/
+gen/
+out/
+.class
